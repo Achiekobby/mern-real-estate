@@ -5,6 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
+import errorMiddleware from "./middlewares/error.middleware.js";
 
 class App {
   port;
@@ -21,6 +22,7 @@ class App {
     this.initiateMiddleware();
     this.establishDBConnection();
     this.initiateControllers(controllers);
+    this.initializeErrorMiddleware();
   }
 
   initiateMiddleware() {
@@ -51,6 +53,10 @@ class App {
     } catch (error) {
       console.log(error.message);
     }
+  }
+
+  initializeErrorMiddleware(){
+    this.express.use(errorMiddleware);
   }
 
   listen() {

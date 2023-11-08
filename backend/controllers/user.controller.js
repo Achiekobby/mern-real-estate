@@ -21,7 +21,7 @@ class UserController {
     );
   }
 
-  async register(req, res) {
+  async register(req, res, next) {
     try {
       const { first_name, last_name, email, password, phone_number } = req.body;
       //* hashing the password
@@ -40,7 +40,7 @@ class UserController {
         .status(201)
         .json({ status: "success", message: "User created successfully" });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      next(error)
     }
   }
 }
