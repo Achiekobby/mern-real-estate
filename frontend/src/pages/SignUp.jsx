@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {BiError} from "react-icons/bi"
 
 export default function SignUp() {
@@ -21,6 +21,7 @@ export default function SignUp() {
     password: "",
     phone_number: "",
   });
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -99,6 +100,8 @@ export default function SignUp() {
         return;
       }
       setLoading(false);
+      setError(null)
+      navigate("/sign-in");
     } catch (error) {
       setLoading(false);
       setError(error);
