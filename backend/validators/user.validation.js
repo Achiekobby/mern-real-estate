@@ -8,4 +8,9 @@ const register = Joi.object({
   phone_number: Joi.string().min(13).max(15).required(),
 });
 
-export default { register };
+const login = Joi.object({
+  email:Joi.string().email().required(),
+  password: Joi.string().min(8).max(255).required()
+})
+
+export default { register, login };
