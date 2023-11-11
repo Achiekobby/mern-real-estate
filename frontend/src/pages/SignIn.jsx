@@ -1,19 +1,26 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {BiError} from "react-icons/bi"
+import { BiError } from "react-icons/bi";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  sign_in_start,
+  sign_in_success,
+  sign_in_failure,
+  failed_validation
+} from "../redux/user/userSlice";
 
 export default function SignIn() {
   const [form_data, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [validationError, setValidationError] = useState({
-    email: "",
-    password: "",
-  });
   const navigate = useNavigate();
+
+  //* Redux operations
+  const dispatch = useDispatch();
+
+  //* reading the values of the error and the loading without using useState hook
+  const { error, loading, validationErrors } = useSelector((state) => state.user);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -21,11 +28,10 @@ export default function SignIn() {
     console.log(form_data);
   };
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      setLoading(true);
+      dispatch(sign_in_start());
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -35,40 +41,17 @@ export default function SignIn() {
       });
       const data = await response.json();
       if (data.status === "failed") {
-        setLoading(false);
-        setError(data.message);
+        dispatch(sign_in_failure(data.message));
         return;
       }
       if (data.errors && data.errors.length > 0) {
-        setLoading(false);
-        data.errors.forEach((error) => {
-          const match = error.match(/"([^"]*)"/);
-          const error_message = match && match[1];
-          switch (error_message) {
-            case "email":
-              setValidationError((prevValidationError) => ({
-                ...prevValidationError,
-                email: error.replace(/"([^"]*)"/, '$1'),
-              }));
-              break;
-            case "password":
-              setValidationError((prevValidationError) => ({
-                ...prevValidationError,
-                password: error.replace(/"([^"]*)"/, '$1'),
-              }));
-              break;
-            default:
-              break;
-          }
-        });
+        dispatch(failed_validation(data.errors))
         return;
       }
-      setLoading(false);
-      setError(null)
+      dispatch(sign_in_success(data));
       navigate("/");
     } catch (error) {
-      setLoading(false);
-      setError(error);
+      dispatch(sign_in_failure(error.message));
       console.log("error:", error);
     }
   };
@@ -86,14 +69,14 @@ export default function SignIn() {
           className="border p-3 rounded-lg"
           name="email"
         />
-        {validationError.email && (
+        {validationErrors.email && (
           <>
-          <p className="flex items-center capitalize text-xs text-red-400">
-          <span>
-            <BiError className="text-red-600 text-sm mr-2" />
-          </span>
-          {validationError.email}
-          </p>
+            <p className="flex items-center capitalize text-xs text-red-400">
+              <span>
+                <BiError className="text-red-600 text-sm mr-2" />
+              </span>
+              {validationErrors.email}
+            </p>
           </>
         )}
 
@@ -105,14 +88,14 @@ export default function SignIn() {
           onChange={handleChange}
           value={form_data.password}
         />
-        {validationError.password && (
+        {validationErrors.password && (
           <>
-          <p className="flex items-center capitalize text-xs text-red-400">
-          <span>
-            <BiError className="text-red-600 text-sm mr-2" />
-          </span>
-          {validationError.password}
-          </p>
+            <p className="flex items-center capitalize text-xs text-red-400">
+              <span>
+                <BiError className="text-red-600 text-sm mr-2" />
+              </span>
+              {validationErrors.password}
+            </p>
           </>
         )}
         <button
