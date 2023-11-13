@@ -29,7 +29,8 @@ class UserController {
       this.login
     );
 
-    //* User
+    //* User google Login
+    this.router.post(`${this.path}/google`, this.google_login);
   }
 
   async register(req, res, next) {
@@ -83,6 +84,15 @@ class UserController {
         .status(200)
         .json({ status: "success", user_info });
     } catch (error) {
+      next(error);
+    }
+  }
+
+  //Todo => Google Sign in
+  google_login(){
+    try{
+
+    }catch(error){
       next(error);
     }
   }
