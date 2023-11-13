@@ -3,6 +3,7 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { Link, useNavigate } from "react-router-dom";
 import {BiError} from "react-icons/bi"
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const [form_data, setFormData] = useState({
@@ -220,6 +221,7 @@ export default function SignUp() {
         >
           {loading ? "loading" : "Sign Up"}
         </button>
+        <OAuth/>
       </form>
       <div className="flex gap-2 mt-5 text-center">
         <p className="text-slate-800">Have an Account? </p>

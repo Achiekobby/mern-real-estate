@@ -28,6 +28,8 @@ class UserController {
       validationMiddleware(validate.login),
       this.login
     );
+
+    //* User
   }
 
   async register(req, res, next) {
