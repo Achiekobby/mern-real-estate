@@ -34,6 +34,10 @@ const user_schema = mongoose.Schema(
       required: true,
       min: 8,
     },
+    avatar:{
+      type:String,
+      default:"https://avatars.dicebear.com/api/adventurer-neutral/mail%40ashallendesign.co.uk.svg"
+    }
   },
   { timestamps: true }
 );

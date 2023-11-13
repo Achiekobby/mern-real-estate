@@ -89,10 +89,61 @@ class UserController {
   }
 
   //Todo => Google Sign in
-  google_login(){
-    try{
+  async google_login(req, res, next) {
+    try {
+      const { email, first_name, last_name, photo_url } = req.body;
+      //* check if the user already exist in our database
+      const user = await User.findOne({ email });
+      if (user) {
+        //* create a token a store inside a cookie
+        const token = jwt.sign(
+          { id: user._id, email: user.email, uuid: user.uuid },
+          process.env.JWT_SECRET
+        );
+        //* making sure password is not passed along with the return user data
+        const { password: pass, uuid: uuid, ...user_info } = user._doc;
 
-    }catch(error){
+        res
+          .cookie("access_token", token, { httpOnly: true })
+          .status(200)
+          .json({ user_info });
+      } else {
+        //! THIS MEANS THE PERSON IS NOT IN THE SYSTEM
+        //* generate a password
+        const password =
+          Math.random().toString(36).slice(-8) +
+          Math.random().toString(36).slice(-8);
+
+        //* hash the password
+        const hashed_password = bcrypt.hashSync(password, 10);
+
+        //* generating a generic phone number for the user
+        const random_phone_number = "+233230000000";
+
+        //* create a new user
+        const new_user = new User({
+          first_name,
+          last_name,
+          email,
+          password: hashed_password,
+          phone_number: random_phone_number,
+          avatar: photo_url,
+        });
+        await new_user.save();
+
+        //* create a token for the user
+        const token = jwt.sign(
+          { id: new_user._id, email: new_user.email, uuid: new_user.uuid },
+          process.env.JWT_SECRET
+        );
+
+        const { password: pass, uuid: uuid, ...user_info } = new_user._doc;
+        res
+          .cookie("access_token", token, { httpOnly: true })
+          .status(201)
+          .json({ user_info });
+      }
+    } catch (error) {
       next(error);
     }
   }
