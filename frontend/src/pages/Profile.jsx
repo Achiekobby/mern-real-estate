@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -7,14 +8,21 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase.js";
+import {
+  update_user_start,
+  update_failure,
+  update_success,
+} from "../redux/user/userSlice.js";
 
 export default function Profile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePercentage, setFilePercentage] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   console.log(filePercentage);
 
@@ -61,6 +69,48 @@ export default function Profile() {
     }
   }, [file]);
 
+  useEffect(() => {
+    if (error) {
+      const set_error = setTimeout(() => {
+        dispatch(update_failure(null));
+      }, 3000);
+
+      return () => {
+        clearTimeout(set_error);
+      };
+    }
+  }, [error, dispatch]);
+
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+    setFormData({ ...formData, [id]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      dispatch(update_user_start());
+      const res = await fetch(
+        `/api/auth/user/update/${currentUser.user_info._id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
+      const data = await res.json();
+      if (data.status === "failed") {
+        dispatch(update_failure(data.message));
+        navigate("/profile");
+        return;
+      }
+      dispatch(update_success(data));
+    } catch (error) {
+      console.log(error);
+      dispatch(update_failure(error.message));
+    }
+  };
+
   return (
     //* firebase storage rules
     //*allow read
@@ -70,7 +120,7 @@ export default function Profile() {
 
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           onChange={(e) => setFile(e.target.files[0])}
           hidden
@@ -84,13 +134,19 @@ export default function Profile() {
           src={currentUser.user_info.avatar}
           alt="https://avatars.dicebear.com/api/adventurer-neutral/mail%40ashallendesign.co.uk.svg"
         />
+        {error && (
+          <p className="text-red-700 text-center">{error}</p>
+        )}
+
         <p className="text-sm self-center">
           {fileUploadError ? (
             <span className="text-red-700">Error Image Upload</span>
           ) : filePercentage > 0 && filePercentage < 100 ? (
             <span className="text-slate-700">{`Uploading: ${filePercentage}% done`}</span>
           ) : filePercentage === 100 ? (
-            <span className="text-green-600 text">Image Uploaded Successfully!</span>
+            <span className="text-green-600 text">
+              Image Uploaded Successfully!
+            </span>
           ) : (
             ""
           )}
@@ -100,26 +156,37 @@ export default function Profile() {
           id="first_name"
           placeholder="first_name"
           className="border p-3 rounded-lg"
+          defaultValue={currentUser.user_info.first_name}
+          onChange={handleChange}
         />
         <input
           type="text"
           id="last_name"
           placeholder="last_name"
           className="border p-3 rounded-lg"
+          defaultValue={currentUser.user_info.last_name}
+          onChange={handleChange}
         />
         <input
           type="text"
           id="email"
           placeholder="email"
           className="border p-3 rounded-lg"
+          defaultValue={currentUser.user_info.email}
+          onChange={handleChange}
         />
         <input
           type="text"
           id="phone_number"
           placeholder="+233*****"
           className="border p-3 rounded-lg"
+          defaultValue={currentUser.user_info.phone_number}
+          onChange={handleChange}
         />
-        <button className="bg-slate-700 text-white rounded-lg uppercase hover:bg-slate-800 p-3">
+        <button
+          disabled={loading}
+          className="bg-slate-700 text-white rounded-lg uppercase hover:bg-slate-800 p-3"
+        >
           update
         </button>
       </form>
@@ -127,6 +194,7 @@ export default function Profile() {
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
+      {/* <p className="text-green-600 text-center">{update_success ? "You have successfully updated your info" : ""}</p> */}
     </div>
   );
 }

@@ -41,6 +41,20 @@ const userSlice = createSlice({
         }
       });
     },
+    update_user_start:(state)=>{
+      state.loading = true;
+    },
+
+    update_success:(state, action)=>{
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = null
+    },
+
+    update_failure:(state, action)=>{
+      state.loading = false;
+      state.error = action.payload;
+    }
   },
 });
 
@@ -49,6 +63,9 @@ export const {
   sign_in_start,
   sign_in_success,
   failed_validation,
+  update_failure,
+  update_success,
+  update_user_start
 } = userSlice.actions;
 
 export default userSlice.reducer;
