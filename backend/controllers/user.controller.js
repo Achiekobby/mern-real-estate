@@ -5,6 +5,7 @@ import User from "./../models/UserModel.js";
 import bcrypt from "bcryptjs";
 import errorHandler from "./../helpers/error.handler.js";
 import jwt from "jsonwebtoken";
+import { verify_token } from "../middlewares/verify.token.js";
 
 class UserController {
   router = Router();
@@ -31,6 +32,13 @@ class UserController {
 
     //* User google Login
     this.router.post(`${this.path}/google`, this.google_login);
+
+    //*update the user details in the database
+    this.router.post(
+      `${this.path}/user/update/:id`,
+      verify_token,
+      this.update_user_details
+    );
   }
 
   async register(req, res, next) {
@@ -143,6 +151,44 @@ class UserController {
           .status(201)
           .json({ user_info });
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //Todo => This api allows the user to update their details including the password
+  async update_user_details(req, res, next) {
+    try {
+      const id = req.params.id;
+      if (req.user.id !== id) {
+        next(
+          errorHandler(
+            401,
+            "You are not allowed to edit another person's account"
+          )
+        );
+      }
+
+      if (req.body.password) {
+        req.body.password = bcrypt.hashSync(req.body.password, 10);
+      }
+      const updated_user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: {
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            email: req.body.email,
+            password: req.body.password,
+            phone_number: req.body.phone_number,
+            avatar: req.body.avatar,
+          },
+        },
+        { new: true }
+      );
+
+      const{password:pass, uuid:uuid, ...user_info} = updated_user._doc
+      res.status(200).json({user_info})
     } catch (error) {
       next(error);
     }

@@ -6,6 +6,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
 import errorMiddleware from "./middlewares/error.middleware.js";
+import cookieParser from "cookie-parser"
 
 class App {
   port;
@@ -32,6 +33,7 @@ class App {
     this.express.use(morgan("dev"));
     this.express.use(express.json());
     this.express.use(express.urlencoded({ extended: false }));
+    this.express.use(cookieParser())
   }
 
   establishDBConnection() {
