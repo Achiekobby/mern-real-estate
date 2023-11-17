@@ -39,6 +39,13 @@ class UserController {
       verify_token,
       this.update_user_details
     );
+
+    //* delete user api route
+    this.router.delete(
+      `${this.path}/user/delete/:id`,
+      verify_token,
+      this.delete_user_account
+    );
   }
 
   async register(req, res, next) {
@@ -187,8 +194,24 @@ class UserController {
         { new: true }
       );
 
-      const{password:pass, uuid:uuid, ...user_info} = updated_user._doc
-      res.status(200).json({user_info})
+      const { password: pass, uuid: uuid, ...user_info } = updated_user._doc;
+      res.status(200).json({ user_info });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //Todo => User Delete Account Functionality
+  async delete_user_account(req, res, next) {
+    try {
+      const id = req.params.id;
+      if (id !== req.user.id) {
+        next(errorHandler(401, "You are not allowed to delete this account"));
+      }
+      //* perform the deletion
+      await User.findByIdAndDelete(id)
+      res.status(200).json({status:"success",message:"Successfully removed your account"});
+
     } catch (error) {
       next(error);
     }
