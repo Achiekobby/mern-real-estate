@@ -46,6 +46,9 @@ class UserController {
       verify_token,
       this.delete_user_account
     );
+
+    //* Sign out route
+    this.router.get(`${this.path}/user/sign-out`, verify_token, this.sign_out);
   }
 
   async register(req, res, next) {
@@ -209,9 +212,26 @@ class UserController {
         next(errorHandler(401, "You are not allowed to delete this account"));
       }
       //* perform the deletion
-      await User.findByIdAndDelete(id)
-      res.status(200).json({status:"success",message:"Successfully removed your account"}).clearCookie("access_token");
+      await User.findByIdAndDelete(id);
+      res
+        .status(200)
+        .json({
+          status: "success",
+          message: "Successfully removed your account",
+        })
+        .clearCookie("access_token");
+    } catch (error) {
+      next(error);
+    }
+  }
 
+  //Todo => Sign out functionality
+  async sign_out(req, res, next) {
+    try {
+      res.clearCookie("access_token");
+      res
+        .status(200)
+        .json({ status: "success", message: "User has logged out" });
     } catch (error) {
       next(error);
     }
