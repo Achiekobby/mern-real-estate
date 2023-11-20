@@ -41,20 +41,35 @@ const userSlice = createSlice({
         }
       });
     },
-    update_user_start:(state)=>{
+    update_user_start: (state) => {
       state.loading = true;
     },
 
-    update_success:(state, action)=>{
+    update_success: (state, action) => {
       state.currentUser = action.payload;
       state.loading = false;
-      state.error = null
+      state.error = null;
     },
 
-    update_failure:(state, action)=>{
+    update_failure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
-    }
+    },
+
+    delete_start: (state) => {
+      state.loading = true;
+    },
+
+    delete_success: (state) => {
+      state.loading = false;
+      state.currentUser = null;
+      state.error=null;
+    },
+
+    delete_failure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -65,7 +80,10 @@ export const {
   failed_validation,
   update_failure,
   update_success,
-  update_user_start
+  update_user_start,
+  delete_success,
+  delete_start,
+  delete_failure
 } = userSlice.actions;
 
 export default userSlice.reducer;

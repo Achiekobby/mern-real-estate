@@ -12,6 +12,9 @@ import {
   update_user_start,
   update_failure,
   update_success,
+  delete_start,
+  delete_success,
+  delete_failure,
 } from "../redux/user/userSlice.js";
 
 export default function Profile() {
@@ -111,6 +114,25 @@ export default function Profile() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      dispatch(delete_start());
+      const user_id = currentUser.user_info._id;
+
+      const res = await fetch(`/api/auth/user/delete/${user_id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.status === "failed") {
+        dispatch(delete_failure(data.message));
+        return;
+      }
+      dispatch(delete_success(data.message));
+    } catch (error) {
+      dispatch(delete_failure(error.message));
+    }
+  };
+
   return (
     //* firebase storage rules
     //*allow read
@@ -134,9 +156,7 @@ export default function Profile() {
           src={currentUser.user_info.avatar}
           alt="https://avatars.dicebear.com/api/adventurer-neutral/mail%40ashallendesign.co.uk.svg"
         />
-        {error && (
-          <p className="text-red-700 text-center">{error}</p>
-        )}
+        {error && <p className="text-red-700 text-center">{error}</p>}
 
         <p className="text-sm self-center">
           {fileUploadError ? (
@@ -191,7 +211,12 @@ export default function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleDeleteAccount}
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
       {/* <p className="text-green-600 text-center">{update_success ? "You have successfully updated your info" : ""}</p> */}

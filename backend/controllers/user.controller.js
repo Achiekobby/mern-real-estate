@@ -210,7 +210,7 @@ class UserController {
       }
       //* perform the deletion
       await User.findByIdAndDelete(id)
-      res.status(200).json({status:"success",message:"Successfully removed your account"});
+      res.status(200).json({status:"success",message:"Successfully removed your account"}).clearCookie("access_token");
 
     } catch (error) {
       next(error);
