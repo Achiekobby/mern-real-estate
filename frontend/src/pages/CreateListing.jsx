@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { app } from "../firebase";
 import { MdOutlineSmsFailed } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
 import {
   getDownloadURL,
   getStorage,
@@ -71,6 +72,11 @@ export default function CreateListing() {
       );
     });
   };
+
+  //* handle image removal from form_data
+  const handleRemoveImage = ()=>{
+    
+  }
 
   return (
     <main className="p-3 max-w-4xl mx-auto">
@@ -217,7 +223,27 @@ export default function CreateListing() {
           </p>
 
           {/* preview the images to be uploaded */}
-          
+          {formData.image_urls.length > 0 &&
+            formData.image_urls.map((image, index) => {
+              return (
+                <>
+                  <div
+                    key={index}
+                    className="flex justify-between p-3 border items-center bg-white"
+                  >
+                    <img
+                      src={image}
+                      alt="listing image"
+                      className="w-20 h-20 rounded-lg object-cover"
+                    />
+                    <button onClick={handleRemoveImage} className="text-white uppercase text-sm p-2 hover:opacity-90 bg-red-700 rounded-full">
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </>
+              );
+            })}
+
           <button className="p-3 bg-slate-700 text-white uppercase rounded-lg hover:opacity-95 disabled:opacity-80">
             Create a Listing
           </button>
