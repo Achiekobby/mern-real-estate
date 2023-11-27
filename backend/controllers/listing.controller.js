@@ -3,11 +3,14 @@ import { verify_token } from "../middlewares/verify.token.js";
 import validationMiddleware from "../middlewares/validation.middleware.js";
 import { listing_validation } from "../validators/listing.validation.js";
 import Listing from "../models/ListingModel.js";
-
+import errorHandler from "../helpers/error.handler.js";
 
 class ListingController {
   router = Router();
   path = "/listing";
+
+  //* path for the user
+  user_path = "/user";
 
   constructor() {
     this.initializeRoutes();
@@ -15,16 +18,44 @@ class ListingController {
 
   initializeRoutes() {
     //* creating a new listing
-    this.router.post(`${this.path}/create`, verify_token, validationMiddleware(listing_validation), this.create_listing);
+    this.router.post(
+      `${this.path}/create`,
+      verify_token,
+      validationMiddleware(listing_validation),
+      this.create_listing
+    );
+
+    //* extracting all the user listings
+    this.router.get(
+      `${this.user_path}/listings/:id`,
+      verify_token,
+      this.get_user_listings
+    );
   }
 
   async create_listing(req, res, next) {
     try {
       const new_listing = await Listing.create(req.body);
-      if(new_listing){
-        const {uuid:uuid, ...listing} = new_listing._doc
-        return res.status(201).json({status:"success", listing:listing})
+      if (new_listing) {
+        const { uuid: uuid, ...listing } = new_listing._doc;
+        return res.status(201).json({ status: "success", listing: listing });
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async get_user_listings(req, res, next) {
+    try {
+      if (req.user.id === req.params.id) {
+        const listings = await Listing.find({ user_ref: req.params.id }).select(
+          "-uuid"
+        );
+        if (listings) {
+          res.status(200).json({ status: "success", listings: listings });
+        }
+      }
+      next(errorHandler(404, "You can only view your own listings"));
     } catch (error) {
       next(error);
     }
