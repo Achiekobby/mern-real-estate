@@ -14,6 +14,7 @@ export default function CreateListing() {
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({ image_urls: [] });
   const [imageUploadError, setImageUploadError] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   console.log("formData", formData);
 
@@ -28,6 +29,7 @@ export default function CreateListing() {
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        setUploading(true);
         promises.push(storeImage(file));
       }
       Promise.all(promises)
@@ -36,13 +38,16 @@ export default function CreateListing() {
             ...formData,
             image_urls: formData.image_urls.concat(urls),
           });
+          setUploading(false);
           setImageUploadError(false);
         })
         .catch((err) => {
           console.log("error:", err);
+          setUploading(false);
           setImageUploadError("Image upload failed (2MB max per image)");
         });
     } else {
+      setUploading(false);
       setImageUploadError("You can only upload 6 images per listing");
     }
   };
@@ -74,9 +79,11 @@ export default function CreateListing() {
   };
 
   //* handle image removal from form_data
-  const handleRemoveImage = ()=>{
-    
-  }
+  const handleRemoveImage = (index) => {
+    setFormData({
+      ...formData, image_urls:formData.image_urls.filter((_, i)=>i!==index)
+    })
+  };
 
   return (
     <main className="p-3 max-w-4xl mx-auto">
@@ -206,9 +213,10 @@ export default function CreateListing() {
             <button
               onClick={handleImageUpload}
               type="button"
+              disabled={uploading}
               className="p-3 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
             >
-              Upload
+              {uploading ? "Uploading" : "Upload"}
             </button>
           </div>
           <p className="text-red-700 text-xs font-bold flex gap-2 items-center">
@@ -234,9 +242,12 @@ export default function CreateListing() {
                     <img
                       src={image}
                       alt="listing image"
-                      className="w-20 h-20 rounded-lg object-cover"
+                      className="w-20 h-20 rounded-lg object-contain"
                     />
-                    <button onClick={handleRemoveImage} className="text-white uppercase text-sm p-2 hover:opacity-90 bg-red-700 rounded-full">
+                    <button
+                      onClick={()=>handleRemoveImage(index)}
+                      className="text-white uppercase text-sm p-2 hover:opacity-90 bg-red-700 rounded-full"
+                    >
                       <FaTrashAlt />
                     </button>
                   </div>
