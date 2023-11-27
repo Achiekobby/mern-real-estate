@@ -3,12 +3,15 @@ import { app } from "../firebase";
 import { MdOutlineSmsFailed } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import {useNavigate} from"react-router-dom";
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+
+import { BiError } from "react-icons/bi";
 
 export default function CreateListing() {
   //* states
@@ -37,6 +40,8 @@ export default function CreateListing() {
   const [submitLoading, setSubmitLoading] = useState(false);
 
   console.log("formData", formData);
+
+  const navigate = useNavigate();
 
   //* function to handle the image upload
   const handleImageUpload = () => {
@@ -133,6 +138,17 @@ export default function CreateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (formData.image_urls.length < 1) {
+        setSubmitError("You must upload at least one image!!");
+        return;
+      }
+
+      if (+formData.regular_price < +formData.discount_price) {
+        setSubmitError(
+          "Discount price cannot be more than the Regular price!!"
+        );
+        return;
+      }
       setSubmitLoading(true);
       const response = await fetch("/api/listing/create", {
         method: "POST",
@@ -151,6 +167,8 @@ export default function CreateListing() {
         setSubmitError(data.message);
         return;
       }
+      //* redirect the user to the listings page
+      navigate(`/listing/${data.listing._id}`);
     } catch (err) {
       console.log(err.message);
       setSubmitLoading(false);
@@ -292,21 +310,23 @@ export default function CreateListing() {
                 <span className="text-xs">($ / months)</span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                id="discount_price"
-                min="50"
-                required
-                onChange={handleChange}
-                value={formData.discount_price}
-                className="p-3 w-full border border-gray-300 rounded-lg"
-              />
-              <div className="flex flex-col items-center">
-                <p>Discount Price</p>
-                <span className="text-xs">($ / months)</span>
+            {formData.offer && (
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  id="discount_price"
+                  min="0"
+                  required
+                  onChange={handleChange}
+                  value={formData.discount_price}
+                  className="p-3 w-full border border-gray-300 rounded-lg"
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discount Price</p>
+                  <span className="text-xs">($ / months)</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -370,14 +390,17 @@ export default function CreateListing() {
               );
             })}
 
-          <button className="p-3 bg-slate-700 text-white uppercase rounded-lg hover:opacity-95 disabled:opacity-80">
+          <button
+            disabled={submitLoading || uploading}
+            className="p-3 bg-slate-700 text-white uppercase rounded-lg hover:opacity-95 disabled:opacity-80"
+          >
             {submitLoading ? "Loading" : "Create a Listing"}
           </button>
-          <p className="text-red-700 text-xs font-bold flex gap-2 items-center">
+          <p className="text-red-700 text-xs justify-center font-bold flex gap-2 items-center">
             {submitError && (
               <>
                 <span className="text-sm font-bold">
-                  <MdOutlineSmsFailed />
+                  <BiError />
                 </span>
                 {submitError}
               </>
