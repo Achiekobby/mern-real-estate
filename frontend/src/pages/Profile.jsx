@@ -222,6 +222,7 @@ export default function Profile() {
           onChange={handleChange}
         />
         <button
+          type="submit"
           disabled={loading}
           className="bg-slate-700 text-white rounded-lg uppercase hover:bg-slate-800 p-3"
         >
@@ -232,6 +233,12 @@ export default function Profile() {
           className="rounded-lg text-white uppercase text-center bg-green-700 p-3 hover:bg-green-600"
         >
           create listing
+        </Link>
+        <Link
+          to="/user/listings"
+          className="rounded-lg text-white uppercase text-center bg-blue-700 p-3 hover:bg-blue-600"
+        >
+          Show Listings
         </Link>
       </form>
       <div className="flex justify-between mt-5">

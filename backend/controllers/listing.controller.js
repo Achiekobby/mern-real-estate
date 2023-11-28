@@ -9,9 +9,6 @@ class ListingController {
   router = Router();
   path = "/listing";
 
-  //* path for the user
-  user_path = "/user";
-
   constructor() {
     this.initializeRoutes();
   }
@@ -27,7 +24,7 @@ class ListingController {
 
     //* extracting all the user listings
     this.router.get(
-      `${this.user_path}/listings/:id`,
+      `/user${this.path}/:id`,
       verify_token,
       this.get_user_listings
     );
@@ -51,13 +48,16 @@ class ListingController {
         const listings = await Listing.find({ user_ref: req.params.id }).select(
           "-uuid"
         );
-        if (listings) {
-          res.status(200).json({ status: "success", listings: listings });
+        if (listings && listings.length >0) {
+          return res.status(200).json({ status: "success", listings });
+        }
+        else{
+          next(errorHandler(404, "You have not listed anything yet!!"))
         }
       }
-      next(errorHandler(404, "You can only view your own listings"));
+      next(errorHandler(400, "You can only view your own listings"));
     } catch (error) {
-      next(error);
+      next(errorHandler(500, error.message));
     }
   }
 }
