@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Listings() {
   const { currentUser } = useSelector((state) => state.user);
@@ -40,6 +41,10 @@ export default function Listings() {
     };
     fetched_data();
   }, []);
+
+  const formatDate = (timestamp) => {
+    return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+  };
 
   return (
     <div>
@@ -113,23 +118,27 @@ export default function Listings() {
                       <p
                         style={{
                           textDecoration: `${
-                            (listing.discount_price!=="0") ? "line-through" : ""
+                            listing.discount_price !== "0" ? "line-through" : ""
                           }`,
                           opacity: `${
-                            (listing.discount_price!=="0") ? "0.5" : "1"
+                            listing.discount_price !== "0" ? "0.5" : "1"
                           }`,
                         }}
                         className="mb-2 text-base text-blue-600 dark:text-blue-500"
                       >
                         Regular: GHC. {Number(listing.regular_price).toFixed(2)}
                       </p>
-                      { (listing.discount_price!=="0") &&
-                        <p className="mb-4 text-base text-green-600 font-semibold dark:text-green-500 text">
-                        Dsc: GHC. {Number(listing.discount_price).toFixed(2)}
+                      {listing.discount_price !== "0" && (
+                        <p className="mb-2 text-base text-green-600 font-semibold dark:text-green-500 text">
+                          Dsc: GHC. {Number(listing.discount_price).toFixed(2)}
+                        </p>
+                      )}
+
+                      <p className="text-sm mb-4 text-neutral-700 dark:text-neutral-300 font-semibold">
+                        {listing.type === "rent" ? `Duration: Monthly` : ""}
                       </p>
-                      }
                       <p className="text-xs text-neutral-500 dark:text-neutral-300">
-                        Last updated 3 mins ago
+                        Last updated {formatDate(listing.createdAt)}
                       </p>
                     </div>
                   </div>
