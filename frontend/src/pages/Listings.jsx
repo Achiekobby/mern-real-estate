@@ -12,35 +12,36 @@ export default function Listings() {
   const [listings, setListings] = useState(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [problem, setProblem] = useState(false)
 
-  useEffect(() => {
-    const fetched_data = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `/api/user/listing/${currentUser.user_info._id}`
-        );
-        const data = await response.json();
-        console.log("data", data);
-        if (data.status === "failed") {
-          setLoading(false);
-          setError({
-            status_code: data.status_code,
-            message: data.message,
-          });
-          return;
-        }
-        setListings(data.listings);
-        setLoading(false);
-      } catch (error) {
+  const fetched_data = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/user/listing/${currentUser.user_info._id}`
+      );
+      const data = await response.json();
+      console.log("data", data);
+      if (data.status === "failed") {
         setLoading(false);
         setError({
-          status_code: 500,
-          message: error.message,
+          status_code: data.status_code,
+          message: data.message,
         });
-        console.log("error:", error);
+        return;
       }
-    };
+      setListings(data.listings);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setError({
+        status_code: 500,
+        message: error.message,
+      });
+      console.log("error:", error);
+    }
+  };
+  useEffect(() => {
     fetched_data();
   }, []);
 
@@ -48,11 +49,35 @@ export default function Listings() {
     return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
   };
 
+  const handleListingDelete = async (listing_id) => {
+    try {
+      //* Make API call
+      const res = await fetch(`/api/user/listing/${listing_id}`, {
+        method: "DELETE",
+        headers:{"Content-Type": "application/json"}
+      });
+      const data = await res.json();
+      if(data.status==="failed"){
+        setProblem(data.message)
+        console.log("delete_error", data.message);
+      }
+      //* call the api to fetch the updated listings again
+      fetched_data();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div>
       {loading && (
         <p className="text-3xl text-center text-black p-3 mx-auto">
           Loading...
+        </p>
+      )}
+      {problem && (
+        <p className="text-3xl text-center text-black p-3 mx-auto">
+          {problem}
         </p>
       )}
       {error && (
@@ -144,10 +169,17 @@ export default function Listings() {
                       </p>
 
                       <div className="flex justify-end mt-4 gap-2">
-                        <button type="button" className="rounded-lg bg-orange-400  hover:bg-orange-500 self-center text-white p-3">
+                        <button
+                          type="button"
+                          className="rounded-lg bg-orange-400  hover:bg-orange-500 self-center text-white p-3"
+                        >
                           <FaEdit />
                         </button>
-                        <button type="button" className="rounded-lg bg-red-700 text-white  hover:bg-red-500 cur self-center p-3">
+                        <button
+                          onClick={() => handleListingDelete(listing._id)}
+                          type="button"
+                          className="rounded-lg bg-red-700 text-white  hover:bg-red-500 cur self-center p-3"
+                        >
                           <RiDeleteBin5Line />
                         </button>
                       </div>
