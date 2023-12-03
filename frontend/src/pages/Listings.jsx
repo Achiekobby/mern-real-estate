@@ -2,6 +2,8 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { FaEdit } from "react-icons/fa";
 
 export default function Listings() {
   const { currentUser } = useSelector((state) => state.user);
@@ -55,7 +57,7 @@ export default function Listings() {
       )}
       {error && (
         <div>
-          <section className="relative z-10 bg-primary py-[120px]">
+          <section className="relative z-10 bg-blue-500 py-[120px]">
             <div className="container mx-auto">
               <div className="-mx-4 flex">
                 <div className="w-full px-4">
@@ -71,7 +73,7 @@ export default function Listings() {
                     </p>
                     <Link
                       to="/profile"
-                      className="inline-block rounded-lg border border-white px-8 py-3 text-center text-base font-semibold text-white transition hover:bg-white hover:text-primary"
+                      className="inline-block rounded-lg border border-white px-8 py-3 text-center text-base font-semibold text-white transition hover:bg-white hover:text-blue-500"
                     >
                       Go Back
                     </Link>
@@ -140,6 +142,15 @@ export default function Listings() {
                       <p className="text-xs text-neutral-500 dark:text-neutral-300">
                         Last updated {formatDate(listing.createdAt)}
                       </p>
+
+                      <div className="flex justify-end mt-4 gap-2">
+                        <button type="button" className="rounded-lg bg-orange-400  hover:bg-orange-500 self-center text-white p-3">
+                          <FaEdit />
+                        </button>
+                        <button type="button" className="rounded-lg bg-red-700 text-white  hover:bg-red-500 cur self-center p-3">
+                          <RiDeleteBin5Line />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </>
