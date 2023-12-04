@@ -29,6 +29,20 @@ class ListingController {
       this.get_user_listings
     );
 
+    //* show the details of a specific listing
+    this.router.get(
+      `/user${this.path}/show/:listing_id`,
+      verify_token,
+      this.show_listing
+    );
+
+    //* Route for updating the details of a listing
+    this.router.post(
+      `/user${this.path}/update/:listing_id`,
+      verify_token,
+      this.update_listing
+    );
+
     this.router.delete(
       `/user${this.path}/:listing_id`,
       verify_token,
@@ -81,23 +95,59 @@ class ListingController {
 
       //*check if the listing belongs to the signed in user
       if (req.user.id !== listing.user_ref) {
-        return res
-          .status(400)
-          .json({
-            status: "failed",
-            message:
-              "You must be the owner of this listing to be able to delete it",
-          });
+        return res.status(400).json({
+          status: "failed",
+          message:
+            "You must be the owner of this listing to be able to delete it",
+        });
       }
 
       //* Proceeding with the delete process
       await Listing.deleteOne({ _id: id });
-      return res
-        .status(200)
-        .json({
-          status: "success",
-          message: "Great, Listing has been removed successfully",
-        });
+      return res.status(200).json({
+        status: "success",
+        message: "Great, Listing has been removed successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //Todo => API to allow the users update the details of a listing
+  async update_listing(req, res, next) {
+    const listing = await Listing.findById(req.params.listing_id);
+    if (!listing) {
+      return next(errorHandler(404, "Listing could not be found"));
+    }
+    if (req.user.id !== listing.user_ref) {
+      return next(errorHandler(401, "You can only edit your own listing"));
+    }
+
+    try {
+      const updated_listing = await Listing.findByIdAndUpdate(
+        req.params.listing_id,
+        req.body,
+        { new: true }
+      );
+      const { uuid: uuid, ...listing } = updated_listing._doc;
+      return res.status(200).json({ status: "success", listing });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  //Todo => API to retrieve the details of a specified listing
+  async show_listing(req, res, next) {
+    try {
+      const listing_details = await Listing.findById(req.params.listing_id);
+      if (!listing_details) {
+        return next(errorHandler(404, "Listing could not be found"));
+      }
+      if (req.user.id !== listing_details.user_ref) {
+        return next(errorHandler(401, "You can only edit your own listing"));
+      }
+      const { uuid: uuid, ...listing } = listing_details._doc;
+      return res.status(200).json({ status: "success", listing });
     } catch (error) {
       next(error);
     }
