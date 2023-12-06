@@ -73,7 +73,7 @@ export default function Listings() {
 
   const handleEditClick = (listing_id)=>{
     try {
-      navigate(`/user/listing/${listing_id}`);
+      navigate(`/user/listing/update/${listing_id}`);
     } catch (error) {
       console.log(error.message);
     }
@@ -140,9 +140,10 @@ export default function Listings() {
             {listings.map((listing) => {
               return (
                 <>
+                <Link to={`/user/listing/${listing._id}`}>
                   <div
                     key={listing._id}
-                    className="flex flex-col rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 md:max-w-xl md:flex-row"
+                    className="flex flex-col md:h-70 rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 md:max-w-xl md:flex-row"
                   >
                     <img
                       className="h-90 w-full md:w-3/10 rounded-t-lg object-cover md:h-auto md:rounded-none md:rounded-l-lg"
@@ -151,7 +152,7 @@ export default function Listings() {
                     />
                     <div className="flex flex-col justify-start p-6 w-full md:w-7/10">
                       <h5 className="mb-2 text-xl text-neutral-800 font-bold dark:text-neutral-50">
-                        {listing.name}
+                        {listing.name.substr(0,10)}...
                       </h5>
                       <p
                         style={{
@@ -166,11 +167,11 @@ export default function Listings() {
                       >
                         Regular: GHC. {Number(listing.regular_price).toFixed(2)}
                       </p>
-                      {listing.discount_price !== "0" && (
+                      {
                         <p className="mb-2 text-base text-green-600 font-semibold dark:text-green-500 text">
-                          Dsc: GHC. {Number(listing.discount_price).toFixed(2)}
+                          New: GHC. {Number(listing.discount_price).toFixed(2)}
                         </p>
-                      )}
+                      }
 
                       <p className="text-sm mb-4 text-neutral-700 dark:text-neutral-300 font-semibold">
                         {listing.type === "rent" ? `Duration: Monthly` : ""}
@@ -197,6 +198,7 @@ export default function Listings() {
                       </div>
                     </div>
                   </div>
+                  </Link>
                 </>
               );
             })}
