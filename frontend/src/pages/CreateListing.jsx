@@ -168,7 +168,7 @@ export default function CreateListing() {
         return;
       }
       //* redirect the user to the listings page
-      navigate(`/listing/${data.listing._id}`);
+      navigate(`/user/listings`);
     } catch (err) {
       console.log(err.message);
       setSubmitLoading(false);
