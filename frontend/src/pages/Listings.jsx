@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
 
 export default function Listings() {
   const { currentUser } = useSelector((state) => state.user);
@@ -13,6 +14,8 @@ export default function Listings() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [problem, setProblem] = useState(false)
+
+  const navigate = useNavigate();
 
   const fetched_data = async () => {
     try {
@@ -67,6 +70,14 @@ export default function Listings() {
       console.log(error.message);
     }
   };
+
+  const handleEditClick = (listing_id)=>{
+    try {
+      navigate(`/user/listing/${listing_id}`);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   return (
     <div>
@@ -170,6 +181,7 @@ export default function Listings() {
 
                       <div className="flex justify-end mt-4 gap-2">
                         <button
+                          onClick={()=>handleEditClick(listing._id)}
                           type="button"
                           className="rounded-lg bg-orange-400  hover:bg-orange-500 self-center text-white p-3"
                         >
