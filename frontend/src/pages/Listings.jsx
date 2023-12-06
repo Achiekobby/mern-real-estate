@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Listings() {
   const { currentUser } = useSelector((state) => state.user);
@@ -13,7 +13,7 @@ export default function Listings() {
   const [listings, setListings] = useState(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [problem, setProblem] = useState(false)
+  const [problem, setProblem] = useState(false);
 
   const navigate = useNavigate();
 
@@ -57,11 +57,11 @@ export default function Listings() {
       //* Make API call
       const res = await fetch(`/api/user/listing/${listing_id}`, {
         method: "DELETE",
-        headers:{"Content-Type": "application/json"}
+        headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      if(data.status==="failed"){
-        setProblem(data.message)
+      if (data.status === "failed") {
+        setProblem(data.message);
         console.log("delete_error", data.message);
       }
       //* call the api to fetch the updated listings again
@@ -71,13 +71,13 @@ export default function Listings() {
     }
   };
 
-  const handleEditClick = (listing_id)=>{
+  const handleEditClick = (listing_id) => {
     try {
       navigate(`/user/listing/update/${listing_id}`);
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
   return (
     <div>
@@ -87,9 +87,7 @@ export default function Listings() {
         </p>
       )}
       {problem && (
-        <p className="text-3xl text-center text-black p-3 mx-auto">
-          {problem}
-        </p>
+        <p className="text-3xl text-center text-black p-3 mx-auto">{problem}</p>
       )}
       {error && (
         <div>
@@ -140,7 +138,6 @@ export default function Listings() {
             {listings.map((listing) => {
               return (
                 <>
-                <Link to={`/user/listing/${listing._id}`}>
                   <div
                     key={listing._id}
                     className="flex flex-col md:h-70 rounded-lg bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 md:max-w-xl md:flex-row"
@@ -151,9 +148,11 @@ export default function Listings() {
                       alt={listing.name}
                     />
                     <div className="flex flex-col justify-start p-6 w-full md:w-7/10">
+                      <Link to={`/listing/${listing._id}`}>
                       <h5 className="mb-2 text-xl text-neutral-800 font-bold dark:text-neutral-50">
-                        {listing.name.substr(0,10)}...
+                        {listing.name.substr(0, 10)}...
                       </h5>
+                      </Link>
                       <p
                         style={{
                           textDecoration: `${
@@ -182,7 +181,7 @@ export default function Listings() {
 
                       <div className="flex justify-end mt-4 gap-2">
                         <button
-                          onClick={()=>handleEditClick(listing._id)}
+                          onClick={() => handleEditClick(listing._id)}
                           type="button"
                           className="rounded-lg bg-orange-400  hover:bg-orange-500 self-center text-white p-3"
                         >
@@ -198,7 +197,7 @@ export default function Listings() {
                       </div>
                     </div>
                   </div>
-                  </Link>
+                  {/* </Link> */}
                 </>
               );
             })}
