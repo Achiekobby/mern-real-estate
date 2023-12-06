@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function ListingDetails() {
   SwiperCore.use([Navigation]);
@@ -90,21 +91,47 @@ export default function ListingDetails() {
 
       {/* the details page goes here */}
       {listing && !loading && !error && (
-        <Swiper
-          navigation
-        >
-          {listing.image_urls.map(url => (
-            <SwiperSlide key={url}>
-              <div
-                className="h-[450px]"
-                style={{
-                  background: `url(${url}) center no-repeat`,
-                  backgroundSize: "cover",
-                }}
-              ></div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <div className="mb-10">
+          <Swiper navigation>
+            {listing.image_urls.map((url) => (
+              <SwiperSlide key={url}>
+                <div
+                  className="h-[450px]"
+                  style={{
+                    background: `url(${url}) center no-repeat`,
+                    backgroundSize: "cover",
+                  }}
+                ></div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+          <div className="max-w-6xl mx-auto">
+            <p className=" font-bold text-black  p-3 text-3xl">
+              {listing.discount_price == "0"
+                ? `GHC.${listing.regular_price} `
+                : `updated GHC.${listing.discount_price} - ${listing.regular_price}`}
+              {listing.type == "rent" ? " /month" : " /unit"}
+            </p>
+            <p className=" flex items-center mt-3 gap-2 text-slate-600 my2 text-sm">
+              <FaMapMarkerAlt className="text-green-700" />
+              {listing.address}
+            </p>
+            <div className=" flex items-center gap-4 mt-3">
+              <p className="bg-orange-900 w-full max-w-[150px] text-white text-center p-2 font-bold text-lg rounded-md mt-3">
+                {listing.type === "rent" ? "Rent" : "For Sale"}
+              </p>
+              {listing.offer && (
+                <p className="bg-green-900 w-full max-w-[150px] text-white text-center p-2 font-bold text-lg rounded-md mt-3">
+                  GHC{" "}
+                  {(+listing.regular_price - +listing.discount_price).toFixed(
+                    2
+                  )}
+                </p>
+              )}
+            </div>
+            <p className="mt-6 text-slate-900 font-semibold">{listing.description}</p>
+          </div>
+        </div>
       )}
     </main>
   );
