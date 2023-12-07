@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking } from "react-icons/fa";
 
 export default function ListingDetails() {
   SwiperCore.use([Navigation]);
@@ -130,6 +130,24 @@ export default function ListingDetails() {
               )}
             </div>
             <p className="mt-6 text-slate-900 font-semibold">{listing.description}</p>
+            <ul className="mt-6 text-green-900 font-semibold text-sm flex items-center gap-6 ">
+              <li className="flex gap-2 items-center whitespace-nowrap ">
+                <FaBed className="text-lg" />
+                {listing.bed_rooms > 1 ? `${listing.bed_rooms} beds ` : `${listing.bed_rooms} bed`}
+              </li>
+              <li className="flex gap-2 items-center whitespace-nowrap ">
+                <FaBath className="text-lg" />
+                {listing.bath_rooms > 1 ? `${listing.bath_rooms} bathrooms ` : `${listing.bath_rooms} bathroom`}
+              </li>
+              <li className="flex gap-2 items-center whitespace-nowrap ">
+                <FaParking className="text-lg" />
+                {listing.parking ? `Parking ` : `No Parking`}
+              </li>
+              <li className="flex gap-2 items-center whitespace-nowrap ">
+                <FaChair className="text-lg" />
+                {listing.furnished ? `Furnished ` : `No Furnishing`}
+              </li>
+            </ul>
           </div>
         </div>
       )}
