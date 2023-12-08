@@ -143,9 +143,9 @@ class ListingController {
       if (!listing_details) {
         return next(errorHandler(404, "Listing could not be found"));
       }
-      if (req.user.id !== listing_details.user_ref) {
-        return next(errorHandler(401, "You can only edit your own listing"));
-      }
+      // if (req.user.id !== listing_details.user_ref) {
+      //   return next(errorHandler(401, "You can only edit your own listing"));
+      // }
       const { uuid: uuid, ...listing } = listing_details._doc;
       return res.status(200).json({ status: "success", listing });
     } catch (error) {

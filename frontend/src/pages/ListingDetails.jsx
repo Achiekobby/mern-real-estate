@@ -5,7 +5,14 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
-import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking } from "react-icons/fa";
+import {
+  FaBath,
+  FaBed,
+  FaChair,
+  FaMapMarkerAlt,
+  FaParking,
+} from "react-icons/fa";
+import {useSelector} from "react-redux";
 
 export default function ListingDetails() {
   SwiperCore.use([Navigation]);
@@ -14,6 +21,9 @@ export default function ListingDetails() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   console.log(listing);
+
+  //Todo=>getting the current logged in user
+  const {currentUser} = useSelector((state)=>state.user);
 
   const fetch_listing = async () => {
     try {
@@ -105,8 +115,8 @@ export default function ListingDetails() {
               </SwiperSlide>
             ))}
           </Swiper>
-          <div className="max-w-6xl mx-auto">
-            <p className=" font-bold text-black  p-3 text-3xl">
+          <div className="p-3  max-w-6xl mx-auto">
+            <p className=" font-bold text-black text-3xl">
               {listing.discount_price == "0"
                 ? `GHC.${listing.regular_price} `
                 : `updated GHC.${listing.discount_price} - ${listing.regular_price}`}
@@ -129,15 +139,21 @@ export default function ListingDetails() {
                 </p>
               )}
             </div>
-            <p className="mt-6 text-slate-900 font-semibold">{listing.description}</p>
+            <p className="mt-6 text-slate-900 font-semibold">
+              {listing.description}
+            </p>
             <ul className="mt-6 text-green-900 font-semibold text-sm flex items-center gap-6 ">
               <li className="flex gap-2 items-center whitespace-nowrap ">
                 <FaBed className="text-lg" />
-                {listing.bed_rooms > 1 ? `${listing.bed_rooms} beds ` : `${listing.bed_rooms} bed`}
+                {listing.bed_rooms > 1
+                  ? `${listing.bed_rooms} beds `
+                  : `${listing.bed_rooms} bed`}
               </li>
               <li className="flex gap-2 items-center whitespace-nowrap ">
                 <FaBath className="text-lg" />
-                {listing.bath_rooms > 1 ? `${listing.bath_rooms} bathrooms ` : `${listing.bath_rooms} bathroom`}
+                {listing.bath_rooms > 1
+                  ? `${listing.bath_rooms} bathrooms `
+                  : `${listing.bath_rooms} bathroom`}
               </li>
               <li className="flex gap-2 items-center whitespace-nowrap ">
                 <FaParking className="text-lg" />
@@ -148,7 +164,15 @@ export default function ListingDetails() {
                 {listing.furnished ? `Furnished ` : `No Furnishing`}
               </li>
             </ul>
+            {currentUser && (listing.user_ref !== currentUser.user_info._id) && (
+            <div className="mt-6 max-w-6xl mx-auto">
+              <button className="text-white w-full bg-slate-700 hover:opacity-95 rounded-lg uppercase p-3">
+                Contact Landlord
+              </button>
+            </div>
+            )}
           </div>
+          {/* button for contact landlord */}
         </div>
       )}
     </main>
