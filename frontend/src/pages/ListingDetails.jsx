@@ -13,6 +13,7 @@ import {
   FaParking,
 } from "react-icons/fa";
 import {useSelector} from "react-redux";
+import ContactComponent from "../components/ContactComponent";
 
 export default function ListingDetails() {
   SwiperCore.use([Navigation]);
@@ -20,7 +21,8 @@ export default function ListingDetails() {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log(listing);
+  const [contact, setContact] = useState(false);
+  // console.log(listing);
 
   //Todo=>getting the current logged in user
   const {currentUser} = useSelector((state)=>state.user);
@@ -164,13 +166,16 @@ export default function ListingDetails() {
                 {listing.furnished ? `Furnished ` : `No Furnishing`}
               </li>
             </ul>
-            {currentUser && (listing.user_ref !== currentUser.user_info._id) && (
+            {currentUser && (listing.user_ref !== currentUser.user_info._id) && !contact && (
             <div className="mt-6 max-w-6xl mx-auto">
-              <button className="text-white w-full bg-slate-700 hover:opacity-95 rounded-lg uppercase p-3">
+              <button type="button" onClick={()=>setContact(true)} className="text-white w-full bg-slate-700 hover:opacity-95 rounded-lg uppercase p-3">
                 Contact Landlord
               </button>
             </div>
             )}
+            {
+              contact && (<ContactComponent listing={listing}/>)
+            }
           </div>
           {/* button for contact landlord */}
         </div>

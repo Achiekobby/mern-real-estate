@@ -4,7 +4,7 @@ import validationMiddleware from "../middlewares/validation.middleware.js";
 import { listing_validation } from "../validators/listing.validation.js";
 import Listing from "../models/ListingModel.js";
 import errorHandler from "../helpers/error.handler.js";
-
+import User from "../models/UserModel.js";
 class ListingController {
   router = Router();
   path = "/listing";
@@ -47,6 +47,12 @@ class ListingController {
       `/user${this.path}/:listing_id`,
       verify_token,
       this.remove_listing
+    );
+
+    this.router.get(
+      `${this.path}/owner/:id`,
+      verify_token,
+      this.get_listing_owner
     );
   }
 
@@ -148,6 +154,19 @@ class ListingController {
       // }
       const { uuid: uuid, ...listing } = listing_details._doc;
       return res.status(200).json({ status: "success", listing });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async get_listing_owner(req, res, next) {
+    try {
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return next(new errorHandler(404, "Listing owner not found"));
+      }
+      const { uuid: uuid, password: password, ...user_details } = user._doc;
+      return res.status(200).json({ status: "success", user: user_details });
     } catch (error) {
       next(error);
     }
