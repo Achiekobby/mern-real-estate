@@ -30,11 +30,7 @@ class ListingController {
     );
 
     //* show the details of a specific listing
-    this.router.get(
-      `/user${this.path}/show/:listing_id`,
-      verify_token,
-      this.show_listing
-    );
+    this.router.get(`/user${this.path}/show/:listing_id`, this.show_listing);
 
     //* Route for updating the details of a listing
     this.router.post(
@@ -54,6 +50,9 @@ class ListingController {
       verify_token,
       this.get_listing_owner
     );
+
+    //* API to search for listing using route query parameters
+    this.router.get(`${this.path}/search`, this.search_listings);
   }
 
   async create_listing(req, res, next) {
@@ -167,6 +166,57 @@ class ListingController {
       }
       const { uuid: uuid, password: password, ...user_details } = user._doc;
       return res.status(200).json({ status: "success", user: user_details });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async search_listings(req, res, next) {
+    try {
+      const limit = req.query.limit || 9;
+      const startIndex = parseInt(req.query.startIndex) || 0;
+
+      let offer = req.query.offer;
+      if (offer === undefined || offer === "false") {
+        offer = { $in: [false, true] };
+      }
+
+      let furnished = req.query.furnished;
+      if (furnished === undefined || furnished === "false") {
+        furnished = { $in: [true, false] };
+      }
+
+      let parking = req.query.parking;
+      if (parking === undefined || parking === "false") {
+        parking = { $in: [true, false] };
+      }
+
+      let type = req.query.type;
+      if (type === undefined || type === "all") {
+        type = { $in: ["rent", "sale"] };
+      }
+
+      const search_word = req.query.search_word || "";
+
+      const sort = req.query.sort || "createdAt";
+
+      const order = req.query.order || "desc";
+
+      // Todo => query to search listings based on defined parameters.
+      const listings = await Listing.find({
+        name: { $regex: search_word, $options: "i" },
+        offer,
+        furnished,
+        type,
+        parking,
+      })
+        .sort({ [sort]: order })
+        .limit(limit)
+        .skip(startIndex).select("-uuid");
+
+      return res
+        .status(200)
+        .json({ status: "success", listings: listings });
     } catch (error) {
       next(error);
     }
