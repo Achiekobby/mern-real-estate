@@ -216,7 +216,7 @@ class ListingController {
 
       return res
         .status(200)
-        .json({ status: "success", listings: listings });
+        .json({ status: "success", listings });
     } catch (error) {
       next(error);
     }

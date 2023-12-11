@@ -19,7 +19,7 @@ export default function Header() {
       url_params.set("search_word", searchWord);
 
       const search_query = url_params.toString();
-      console.log("search query: " + search_query);
+      // console.log("search query: " + search_query);
 
       navigate(`/search?${search_query}`);
 
