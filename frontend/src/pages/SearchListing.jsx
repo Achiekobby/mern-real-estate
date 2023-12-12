@@ -11,10 +11,12 @@ export default function SearchListing() {
     furnished: false,
     sort: "createdAt",
     order: "desc",
+    startIndex:0
   });
 
   const [loading, setLoading] = useState(false);
   const [listing_data, setListingData] = useState([]);
+  const [showMore, setShowMore] = useState(true);
 
   const navigate = useNavigate();
 
@@ -74,6 +76,7 @@ export default function SearchListing() {
       url_params.set("offer", sidebarSearchData.offer);
       url_params.set("sort", sidebarSearchData.sort);
       url_params.set("order", sidebarSearchData.order);
+      url_params.set("startIndex", sidebarSearchData.startIndex);
       const search_query = url_params.toString();
 
       navigate(`/search?${search_query}`);
@@ -91,6 +94,7 @@ export default function SearchListing() {
     const furnishedFromUrlParams = url_params.get("furnished");
     const sortFromUrlParams = url_params.get("sort");
     const orderFromUrlParams = url_params.get("order");
+    const startIndexFromUrlParams = url_params.get("startIndex");
     if (
       searchWordFromUrlParams ||
       typeFromUrlParams ||
@@ -98,7 +102,8 @@ export default function SearchListing() {
       parkingFromUrlParams ||
       furnishedFromUrlParams ||
       sortFromUrlParams ||
-      orderFromUrlParams
+      orderFromUrlParams||
+      startIndexFromUrlParams
     ) {
       setSideBarSearchData({
         search_word: searchWordFromUrlParams || "",
@@ -108,6 +113,7 @@ export default function SearchListing() {
         furnished: furnishedFromUrlParams === "true" ? true : false,
         sort: sortFromUrlParams || "createdAt",
         order: orderFromUrlParams || "desc",
+        startIndex: startIndexFromUrlParams || 0,
       });
     }
 
@@ -117,6 +123,12 @@ export default function SearchListing() {
         const search_query = url_params.toString();
         const res = await fetch(`/api/listing/search?${search_query}`);
         const data = await res.json();
+        console.log(data.listings.length);
+        if (data.listings.length > 2) {
+          setShowMore(true);
+        }else{
+          setShowMore(false)
+        }
 
         if (data.status === "failed") {
           console.log(`API Error: ${data.message}`);
@@ -132,6 +144,31 @@ export default function SearchListing() {
     };
     fetchListings();
   }, [location.search]);
+
+  const handleShowMore = async () => {
+    try {
+      const numberOfListings = listing_data.length;
+      const start_index = numberOfListings;
+      const url_params = new URLSearchParams(location.search);
+      url_params.set("startIndex", start_index);
+      const search_query = url_params.toString();
+      const res = await fetch(`/api/listing/search?${search_query}`);
+      const data = await res.json();
+      if (data.status === "failed") {
+        console.log(`API Error: ${data.message}`);
+        return;
+      }
+
+      if (data.listings.length < 2) {
+        setShowMore(false);
+      }
+      const listings = data.listings;
+      // console.log(`listings: ${listings}`);
+      setListingData([...listing_data, ...listings]);
+    } catch (error) {
+      console.log(`Error: ${error.message}`);
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -252,11 +289,11 @@ export default function SearchListing() {
           Listing Results:
         </h1>
         <div className="p-7 flex flex-wrap  gap-4">
-            {loading && (
-              <p className="text-center font-semibold text-blue-700 text-3xl">
-                Loading...
-              </p>
-            )}
+          {loading && (
+            <p className="text-center font-semibold text-blue-700 text-3xl">
+              Loading...
+            </p>
+          )}
           {/* if no data was returned */}
           {!loading && listing_data.length === 0 && (
             <p className="text-center p-3 font-semibold text-red-700 text-3xl">
@@ -270,6 +307,15 @@ export default function SearchListing() {
               return <ListingCard key={listing._id} listing={listing} />;
             })}
         </div>
+        {showMore && (
+          <button
+          type="button"
+            className="text-green-700 hover:underline p-7 text-center w-full"
+            onClick={handleShowMore}
+          >
+            Show More
+          </button>
+        )}
       </div>
     </div>
   );
