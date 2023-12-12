@@ -7,6 +7,7 @@ import helmet from "helmet";
 import compression from "compression";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser"
+import path from "path";
 
 class App {
   port;
@@ -18,6 +19,8 @@ class App {
     dotenv.config();
     this.port = process.env.PORT_NUMBER;
     this.mongo_uri = mongo_uri;
+    this.path
+    
 
     //* custom methods
     this.initiateMiddleware();
@@ -34,6 +37,14 @@ class App {
     this.express.use(express.json());
     this.express.use(express.urlencoded({ extended: false }));
     this.express.use(cookieParser())
+
+    const __dirname = path.resolve();
+    this.express.use(express.static(path.join(__dirname,'/frontend/dist')));
+
+    this.express.get('*', (req,res)=>{
+      res.sendFile(path.join(__dirname,'frontend','dist','index.html'));
+    })
+    
   }
 
   establishDBConnection() {

@@ -3,8 +3,10 @@ import App from "./app.js";
 import dotenv from "dotenv";
 import UserController from "./controllers/user.controller.js";
 import ListingController from "./controllers/listing.controller.js";
+import path from "path";
 
 dotenv.config();
-const db_uri = process.env.DB_CONNECTION_URL;
+const db_uri = process.env.DB_ONLINE_CONNECTION;
 const app = new App([new UserController(), new ListingController()], db_uri);
+
 app.listen();
