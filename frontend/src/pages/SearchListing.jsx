@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ListingCard from "../components/ListingCard";
 
 export default function SearchListing() {
   const [sidebarSearchData, setSideBarSearchData] = useState({
@@ -13,7 +14,7 @@ export default function SearchListing() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [listing_data, setListingData] = useState(null);
+  const [listing_data, setListingData] = useState([]);
 
   const navigate = useNavigate();
 
@@ -121,7 +122,7 @@ export default function SearchListing() {
           console.log(`API Error: ${data.message}`);
           return;
         }
-        
+
         setListingData(data.listings);
         setLoading(false);
       } catch (error) {
@@ -246,31 +247,29 @@ export default function SearchListing() {
       </div>
 
       {/* search results */}
-      <div className="p-7">
-        <h1 className="text-slate-700 uppercase font-semibold text-3xl border-b-2">
-          Listing Results:{" "}
-          <span>
+      <div className="flex-1">
+        <h1 className="p-3 text-slate-700 uppercase font-semibold text-3xl border-b-2 mt-5">
+          Listing Results:
+        </h1>
+        <div className="p-7 flex flex-wrap  gap-4">
             {loading && (
               <p className="text-center font-semibold text-blue-700 text-3xl">
                 Loading...
               </p>
             )}
-          </span>
-        </h1>
-        {/* if no data was returned */}
-        {!listing_data && (
-          <p className="text-center p-3 font-semibold text-red-700 text-3xl">
-            No results found
-          </p>
-        )}
-        {
-          listing_data.map((listing)=>{
-            return(
-              <>
-              </>
-            );
-          })
-        }
+          {/* if no data was returned */}
+          {!loading && listing_data.length === 0 && (
+            <p className="text-center p-3 font-semibold text-red-700 text-3xl">
+              No results found
+            </p>
+          )}
+
+          {!loading &&
+            listing_data &&
+            listing_data.map((listing) => {
+              return <ListingCard key={listing._id} listing={listing} />;
+            })}
+        </div>
       </div>
     </div>
   );

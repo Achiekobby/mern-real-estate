@@ -8,5 +8,6 @@ export default {
     extend: {},
   },
   plugins: [
+    '@tailwindcss/line-clamp',
   ],
 }
