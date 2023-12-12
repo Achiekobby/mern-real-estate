@@ -31,7 +31,15 @@ class App {
 
   initiateMiddleware() {
     this.express.use(cors());
-    this.express.use(helmet());
+    // this.express.use(helmet());
+    this.express.use(
+      helmet.contentSecurityPolicy({
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "https://firebasestorage.googleapis.com"],
+        },
+      })
+    );
     this.express.use(compression());
     this.express.use(morgan("dev"));
     this.express.use(express.json());
