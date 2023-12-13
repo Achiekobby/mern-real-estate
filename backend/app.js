@@ -36,7 +36,8 @@ class App {
       helmet.contentSecurityPolicy({
         directives: {
           defaultSrc: ["'self'"],
-          scriptSrc: ["'self'", "https://firebasestorage.googleapis.com"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "https://firebasestorage.googleapis.com"],
+          imgSrc: ["'self'", "https://firebasestorage.googleapis.com"],
         },
       })
     );
