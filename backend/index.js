@@ -3,7 +3,6 @@ import App from "./app.js";
 import dotenv from "dotenv";
 import UserController from "./controllers/user.controller.js";
 import ListingController from "./controllers/listing.controller.js";
-import path from "path";
 
 dotenv.config();
 const db_uri = process.env.DB_ONLINE_CONNECTION;
