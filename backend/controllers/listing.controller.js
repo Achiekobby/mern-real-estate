@@ -24,7 +24,7 @@ class ListingController {
 
     //* extracting all the user listings
     this.router.get(
-      `/user${this.path}/:id`,
+      `/listed/items/:id`,
       verify_token,
       this.get_user_listings
     );

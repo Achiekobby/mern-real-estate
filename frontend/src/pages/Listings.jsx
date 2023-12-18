@@ -21,7 +21,7 @@ export default function Listings() {
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/user/listing/${currentUser.user_info._id}`,{headers: {'Content-Type': 'application/json'}},
+        `/api/listed/items/${currentUser.user_info._id}`,{headers: {'Content-Type': 'application/json'}},
       );
       console.log("content-type:",response.headers.get('Content-Type')); 
       console.log(response);
