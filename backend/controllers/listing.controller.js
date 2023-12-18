@@ -73,6 +73,7 @@ class ListingController {
         const listings = await Listing.find({ user_ref: req.params.id }).select(
           "-uuid"
         );
+        return listings;
         if (listings && listings.length > 0) {
           return res.status(200).json({ status: "success", listings });
         } else {
