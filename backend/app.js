@@ -6,7 +6,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
 import errorMiddleware from "./middlewares/error.middleware.js";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 import path from "path";
 
 class App {
@@ -19,8 +19,7 @@ class App {
     dotenv.config();
     this.port = process.env.PORT_NUMBER;
     this.mongo_uri = mongo_uri;
-    this.path
-    
+    this.path;
 
     //* custom methods
     this.initiateMiddleware();
@@ -30,12 +29,16 @@ class App {
   }
 
   initiateMiddleware() {
-    this.express.use(cors({ origin: '*' }));
+    this.express.use(cors({ origin: "*" }));
     this.express.use(
       helmet.contentSecurityPolicy({
         directives: {
-          defaultSrc: ["'self'", 'https://firebasestorage.googleapis.com'],
-          scriptSrc: ["'self'", "'unsafe-inline'", "https://firebasestorage.googleapis.com"],
+          defaultSrc: ["'self'", "https://firebasestorage.googleapis.com"],
+          scriptSrc: [
+            "'self'",
+            "'unsafe-inline'",
+            "https://firebasestorage.googleapis.com",
+          ],
           imgSrc: ["'self'", "https://firebasestorage.googleapis.com"],
         },
       })
@@ -44,15 +47,7 @@ class App {
     this.express.use(morgan("dev"));
     this.express.use(express.json());
     this.express.use(express.urlencoded({ extended: false }));
-    this.express.use(cookieParser())
-
-    const __dirname = path.resolve();
-    this.express.use(express.static(path.join(__dirname,'frontend','dist')));
-
-    this.express.get('*', (req,res)=>{
-      res.sendFile(path.join(__dirname,'frontend','dist','index.html'));
-    })
-    
+    this.express.use(cookieParser());
   }
 
   establishDBConnection() {
@@ -68,6 +63,20 @@ class App {
 
   initiateControllers(controllers) {
     try {
+      const __dirname = path.resolve();
+      const frontendPath = path.join(__dirname, "..", "frontend", "dist");
+      // this.express.use(express.static(path.join(__dirname,'frontend','dist')));
+      this.express.use(express.static(frontendPath));
+
+      // this.express.get('*', (req,res)=>{
+      //   res.sendFile(path.join(__dirname,'frontend','dist','index.html'));
+      // })
+
+      this.express.get("*", (req, res) => {
+        res.sendFile(path.join(frontendPath, "index.html"));
+      });
+
+      //* API Routes
       controllers.forEach((controller) => {
         this.express.use("/api", controller.router);
       });
@@ -76,7 +85,7 @@ class App {
     }
   }
 
-  initializeErrorMiddleware(){
+  initializeErrorMiddleware() {
     this.express.use(errorMiddleware);
   }
 
