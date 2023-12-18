@@ -30,8 +30,7 @@ class App {
   }
 
   initiateMiddleware() {
-    this.express.use(cors());
-    // this.express.use(helmet());
+    this.express.use(cors({ origin: '*' }));
     this.express.use(
       helmet.contentSecurityPolicy({
         directives: {
@@ -48,7 +47,7 @@ class App {
     this.express.use(cookieParser())
 
     const __dirname = path.resolve();
-    this.express.use(express.static(path.join(__dirname,'/frontend/dist')));
+    this.express.use(express.static(path.join(__dirname,'frontend','dist')));
 
     this.express.get('*', (req,res)=>{
       res.sendFile(path.join(__dirname,'frontend','dist','index.html'));
