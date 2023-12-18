@@ -35,7 +35,7 @@ class App {
     this.express.use(
       helmet.contentSecurityPolicy({
         directives: {
-          defaultSrc: ["'self'"],
+          defaultSrc: ["'self'", 'https://firebasestorage.googleapis.com'],
           scriptSrc: ["'self'", "'unsafe-inline'", "https://firebasestorage.googleapis.com"],
           imgSrc: ["'self'", "https://firebasestorage.googleapis.com"],
         },
