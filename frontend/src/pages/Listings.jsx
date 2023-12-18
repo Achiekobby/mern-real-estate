@@ -23,6 +23,7 @@ export default function Listings() {
       const response = await fetch(
         `/api/user/listing/${currentUser.user_info._id}`
       );
+      console.log(response);
       const data = await response.json();
       console.log("data", data);
       if (data.status === "failed") {
