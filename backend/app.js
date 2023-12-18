@@ -64,13 +64,9 @@ class App {
   initiateControllers(controllers) {
     try {
       const __dirname = path.resolve();
-      const frontendPath = path.join(__dirname, ".", "frontend", "dist");
-      // this.express.use(express.static(path.join(__dirname,'frontend','dist')));
-      this.express.use(express.static(frontendPath));
+      const frontendPath = path.join(__dirname, "frontend", "dist");
 
-      // this.express.get('*', (req,res)=>{
-      //   res.sendFile(path.join(__dirname,'frontend','dist','index.html'));
-      // })
+      this.express.use(express.static(frontendPath));
 
       this.express.get("*", (req, res) => {
         res.sendFile(path.join(frontendPath, "index.html"));
