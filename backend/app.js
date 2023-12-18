@@ -64,7 +64,7 @@ class App {
   initiateControllers(controllers) {
     try {
       const __dirname = path.resolve();
-      const frontendPath = path.join(__dirname, "..", "frontend", "dist");
+      const frontendPath = path.join(__dirname, ".", "frontend", "dist");
       // this.express.use(express.static(path.join(__dirname,'frontend','dist')));
       this.express.use(express.static(frontendPath));
 
